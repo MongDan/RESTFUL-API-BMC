@@ -32,7 +32,6 @@ class ProfileController extends Controller
     $data = [
         'no_reg' => $user->no_reg,
         'username' => $user->username,
-        'nama' => $user->nama,
         'alamat' => $user->alamat,
         'umur' => $user->umur,
     ];
@@ -58,12 +57,10 @@ class ProfileController extends Controller
     // 🔹 Validasi per jenis user
     if ($user instanceof \App\Models\Bidan) {
         $validated = $request->validate([
-            'nama' => 'sometimes|string|max:100',
             'username' => 'sometimes|string|max:25|unique:bidan,username,' . $user->id,
         ]);
     } else {
         $validated = $request->validate([
-            'nama' => 'sometimes|string|max:100',
             'username' => 'sometimes|string|max:25|unique:pasien,username,' . $user->no_reg,
             'alamat' => 'sometimes|string|max:25',
             'umur' => 'sometimes|numeric',
@@ -81,7 +78,6 @@ class ProfileController extends Controller
         $data = [
             'no_reg' => $user->no_reg,
             'username' => $user->username,
-            'nama' => $user->nama,
             'alamat' => $user->alamat,
             'umur' => $user->umur,
         ];

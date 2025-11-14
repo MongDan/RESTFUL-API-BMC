@@ -75,7 +75,7 @@ class Bidan extends Authenticatable implements JWTSubject
         ]);
     }
 
-    // Cek apakah pasien sudah punya persalinan aktif
+    // Cek existing persalinan
     $existing = Persalinan::where('pasien_no_reg', $pasien->no_reg)
         ->where('status', 'aktif')
         ->first();
@@ -86,15 +86,16 @@ class Bidan extends Authenticatable implements JWTSubject
         ]);
     }
 
-    // Generate ID unik misalnya: Persalinan001, Persalinan002, dst.
+    // Generate ID persalinan
     $lastPersalinan = Persalinan::orderBy('id', 'desc')->first();
     $nextNumber = $lastPersalinan
-        ? (intval(preg_replace('/\D/', '', $lastPersalinan->id)) + 1)
+        ? intval(preg_replace('/\D/', '', $lastPersalinan->id)) + 1
         : 1;
+
     $id = 'Persalinan' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
     // Buat persalinan baru
-    return Persalinan::create([
+    $persalinanBaru = Persalinan::create([
         'id' => $id,
         'pasien_no_reg' => $pasien->no_reg,
         'tanggal_jam_rawat' => now(),
@@ -102,6 +103,32 @@ class Bidan extends Authenticatable implements JWTSubject
         'ketuban_pecah' => false,
         'status' => 'aktif',
     ]);
+
+   $lastPartograf = Partograf::where('persalinan_id', 'like', 'Partograf%')->orderBy('id', 'desc')->first();
+
+    $nextNumber = 1;
+    if ($lastPartograf) {
+    // Ambil 2 digit urutan dari ID terakhir
+        preg_match('/Partograf(\d{2})/', $lastPartograf->id, $matches);
+    if (isset($matches[1])) {
+        $nextNumber = intval($matches[1]) + 1;
+    }
+}
+
+    $partografId = 'Partograf' 
+    . str_pad($nextNumber, 2, '0', STR_PAD_LEFT) 
+    . $pasien->no_reg 
+    . date('y'); 
+
+    $partograf = Partograf::create([
+        'id' => $partografId,
+        'persalinan_id' => $persalinanBaru->id,
+    ]);
+
+    return [
+        'persalinan' => $persalinanBaru,
+        'partograf' => $partograf
+    ];
 }
 
 

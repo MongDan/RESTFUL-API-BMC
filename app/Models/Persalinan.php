@@ -14,7 +14,7 @@ class Persalinan extends Model
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = true; // karena di migration kamu pakai timestamps()
+    public $timestamps = false;
 
     protected $fillable = [
         'id',

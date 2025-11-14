@@ -9,6 +9,7 @@ use App\Http\Middleware\BidanMiddleware;
 use Illuminate\Http\Request;
 use App\Http\Controllers\PasienController;
 use App\Http\Controllers\PersalinanController;
+use App\Http\Controllers\CatatanPartografController;
 
 
 // Route::post('/login', [AuthController::class, 'login']);
@@ -34,4 +35,8 @@ Route::middleware([JwtCookieMiddleware::class, BidanMiddleware::class])->group(f
     Route::post('/bidan/register-pasien', [BidanController::class, 'registerPasien']);
     Route::get('/bidan/pasien', [BidanController::class, 'lihatDaftarPasien']);
     Route::post('/bidan/pasien/{pasienId}/mulai-persalinan', [BidanController::class, 'mulaiPersalinan']);
+
+    // Catatan Partograf
+    Route::post('/partograf/{id}/catatan', [CatatanPartografController::class, 'buatCatatanPartograf']);
+    Route::get('/partograf/{id}/catatan', [CatatanPartografController::class, 'getCatatanByPartograf']);
 });
