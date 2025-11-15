@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\PasienController;
 use App\Http\Controllers\PersalinanController;
 use App\Http\Controllers\CatatanPartografController;
+use App\Http\Controllers\KontraksiController;
 
 
 // Route::post('/login', [AuthController::class, 'login']);
@@ -39,4 +40,7 @@ Route::middleware([JwtCookieMiddleware::class, BidanMiddleware::class])->group(f
     // Catatan Partograf
     Route::post('/partograf/{id}/catatan', [CatatanPartografController::class, 'buatCatatanPartograf']);
     Route::get('/partograf/{id}/catatan', [CatatanPartografController::class, 'getCatatanByPartograf']);
+
+    Route::post('/catatan-partograf/{id}/kontraksi', [KontraksiController::class, 'store']);
+
 });

@@ -22,7 +22,8 @@ class CatatanPartografService
     // Ambil semua catatan berdasarkan partograf_id
     public function getByPartografId(string $partografId)
     {
-        return CatatanPartograf::where('partograf_id', $partografId)
+        return CatatanPartograf::with('kontraksi')
+            ->where('partograf_id', $partografId)
             ->orderBy('waktu_catat', 'asc')
             ->get();
     }

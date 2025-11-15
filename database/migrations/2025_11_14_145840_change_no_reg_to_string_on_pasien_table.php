@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kontraksi', function (Blueprint $table) {
-            $table->string('id', 45)->primary();
-            $table->timestamp('waktu_mulai')->nullable();
-            $table->timestamp('waktu_selesai')->nullable();
-            $table->string('catatan_partograf_id', 25)->nullable();
+        Schema::table('string_on_pasien', function (Blueprint $table) {
+            //
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kontraksi');
+        Schema::table('string_on_pasien', function (Blueprint $table) {
+            //
+        });
     }
 };

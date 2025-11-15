@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
+
 class CatatanPartograf extends Model
 {
     use HasFactory;
@@ -40,6 +41,12 @@ class CatatanPartograf extends Model
     {
         return $this->belongsTo(Partograf::class, 'partograf_id', 'id');
     }
+    // Relasi ke banyak Kontraksi
+    public function kontraksi()
+    {
+        return $this->hasMany(Kontraksi::class, 'catatan_partograf_id', 'id');
+    }
+
 
     // Validasi data
     public static function validateData(array $data)
