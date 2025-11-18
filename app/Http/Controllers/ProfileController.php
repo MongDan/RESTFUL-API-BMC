@@ -9,38 +9,40 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class ProfileController extends Controller
 {
     // 🔍 Lihat Profil
-    public function show(Request $request)
-{
-    $user = null;
+   public function show(Request $request)
+    {
+        $data = [];
 
-    try {
-        $user = auth('bidan')->user() ?? auth('pasien')->user();
-    } catch (\Exception $e) {
+        // 1. Cek apakah user login sebagai Bidan
+        if ($user = auth('bidan')->user()) {
+            $data = [
+                'id' => $user->id, // Pastikan ini nama kolom ID bidan (misal: id atau kode_bidan)
+                'username' => $user->username,
+            ];
+        } 
+        // 2. Cek apakah user login sebagai Pasien
+        elseif ($user = auth('pasien')->user()) {
+            $data = [
+                'no_reg' => $user->no_reg,
+                'username' => $user->username,
+                'alamat' => $user->alamat,
+                'umur' => $user->umur,
+            ];
+        } 
+        // 3. Jika tidak ditemukan di kedua guard
+        else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token tidak valid atau user tidak ditemukan',
+            ], 401);
+        }
+
+        // 4. Return respon sukses
         return response()->json([
-            'status' => 'error',
-            'message' => 'Token tidak valid atau user tidak ditemukan',
-        ], 401);
+            'status' => 'success',
+            'data' => $data,
+        ]);
     }
-
-    if (!$user) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'User tidak ditemukan',
-        ], 404);
-    }
-
-    $data = [
-        'no_reg' => $user->no_reg,
-        'username' => $user->username,
-        'alamat' => $user->alamat,
-        'umur' => $user->umur,
-    ];
-
-    return response()->json([
-        'status' => 'success',
-        'data' => $data,
-    ]);
-}
 
 
     public function update(Request $request)
