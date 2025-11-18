@@ -15,9 +15,14 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
 
-            // TANPA prefix('api')
-            Route::middleware('api')
+            Route::prefix('api')
+                ->middleware('api')
                 ->group(base_path('routes/api.php'));
+
+            // jika pakai routes/app.php
+            Route::prefix('api')
+                ->middleware('api')
+                ->group(base_path('routes/app.php'));
         });
     }
 }
