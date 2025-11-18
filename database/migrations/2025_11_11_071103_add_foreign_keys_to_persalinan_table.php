@@ -12,8 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('persalinan', function (Blueprint $table) {
-            $table->foreign(['partograf_id'], 'fk_persalinan_partograf')->references(['id'])->on('partograf')->onUpdate('no action')->onDelete('set null');
-            $table->foreign(['pasien_no_reg'], 'fk_persalinan_pasien')->references(['no_reg'])->on('pasien')->onUpdate('no action')->onDelete('cascade');
+            // Hanya foreign key pasien_no_reg
+            $table->foreign('pasien_no_reg', 'fk_persalinan_pasien')
+                  ->references('no_reg')->on('pasien')
+                  ->onUpdate('no action')
+                  ->onDelete('cascade');
         });
     }
 
@@ -23,7 +26,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('persalinan', function (Blueprint $table) {
-            $table->dropForeign('fk_persalinan_partograf');
             $table->dropForeign('fk_persalinan_pasien');
         });
     }
