@@ -142,7 +142,6 @@ class Bidan extends Authenticatable implements JWTSubject
         'tanggal_jam_mules' => $tanggalMules,
         'ketuban_pecah' => $ketubanPecah,
         'tanggal_jam_ketuban_pecah' => $tglKetuban,
-        'status' => 'aktif',
     ]);
 
     // 🔹 Generate Partograf
