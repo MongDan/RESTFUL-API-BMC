@@ -44,45 +44,44 @@ class CatatanPartografController extends Controller
         ]);
     }
 
-  public function getCatatanPartografPasien($noReg)
+  public function getAllCatatanPartografPasien($noReg)
 {
-    // 1. Cari persalinan aktif pasien
-    $persalinan = Persalinan::where('pasien_no_reg', $noReg)
-        ->where('status', 'aktif')
-        ->first();
+    $persalinanList = Persalinan::where('pasien_no_reg', $noReg)->get();
 
-    if (!$persalinan) {
+    if ($persalinanList->isEmpty()) {
         return response()->json([
-            'message' => 'Pasien belum memiliki persalinan aktif'
+            'message' => 'Pasien belum memiliki persalinan'
         ], 404);
     }
 
-    // 2. Ambil partograf dari persalinan
-    $partograf = $persalinan->partograf;
+    $allCatatan = collect();
 
-    if (!$partograf) {
-        return response()->json([
-            'message' => 'Partograf belum dibuat untuk persalinan ini'
-        ], 404);
+    foreach ($persalinanList as $persalinan) {
+        // Ambil partograf
+        $partograf = $persalinan->partograf;
+        if ($partograf) {
+            // Ambil semua catatan partograf terkait partograf ini
+            $catatan = CatatanPartograf::with('kontraksi')
+                ->where('partograf_id', $partograf->id)
+                ->orderBy('waktu_catat', 'asc') // urut dari awal
+                ->get();
+
+            $allCatatan = $allCatatan->concat($catatan);
+        }
     }
 
-    // 3. Ambil catatan partograf terbaru
-    $catatan = CatatanPartograf::with('kontraksi')
-        ->where('partograf_id', $partograf->id)
-        ->orderBy('waktu_catat', 'desc')
-        ->first();
-
-    if (!$catatan) {
+    if ($allCatatan->isEmpty()) {
         return response()->json([
-            'message' => 'Belum ada catatan partograf'
+            'message' => 'Belum ada catatan partograf untuk pasien ini'
         ], 404);
     }
 
     return response()->json([
-        'message' => 'Catatan partograf terbaru ditemukan',
-        'data' => $catatan
+        'message' => 'Semua catatan partograf pasien ditemukan',
+        'data' => $allCatatan
     ], 200);
 }
+
 
 
 }
