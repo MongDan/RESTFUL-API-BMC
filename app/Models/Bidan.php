@@ -111,6 +111,7 @@ class Bidan extends Authenticatable implements JWTSubject
         'tanggal_jam_mules' => 'required|date',
         'ketuban_pecah' => 'nullable|boolean',
         'tanggal_jam_ketuban_pecah' => 'required_if:ketuban_pecah,true|nullable|date',
+        'tanggal_jam_waktu_bayi_lahir' => 'nullable|date',
     ]);
 
     // 🔹 Cek existing persalinan aktif
@@ -139,6 +140,7 @@ class Bidan extends Authenticatable implements JWTSubject
     // 🔹 tanggal wajib dari FE
     $tanggalRawat = $validated['tanggal_jam_rawat'];
     $tanggalMules = $validated['tanggal_jam_mules'];
+    $tanggalBayiLahir = $validated['tanggal_jam_waktu_bayi_lahir'] ?? null;
 
     // 🔹 Create persalinan
     $persalinanBaru = Persalinan::create([
@@ -148,6 +150,7 @@ class Bidan extends Authenticatable implements JWTSubject
         'tanggal_jam_mules' => $tanggalMules,
         'ketuban_pecah' => $ketubanPecah,
         'tanggal_jam_ketuban_pecah' => $tglKetuban,
+        'tanggal_jam_waktu_bayi_lahir' => $tanggalBayiLahir,
     ]);
 
     // 🔹 Generate Partograf
