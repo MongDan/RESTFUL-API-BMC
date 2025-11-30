@@ -70,4 +70,16 @@ class PasienService
     ];
 }
 
+ public function getPasienWithPersalinan(string $noReg)
+    {
+        return Pasien::with([
+            'persalinan' => function ($q) {
+                $q->orderBy('tanggal_jam_rawat', 'desc');
+            },
+            'persalinan.partograf',
+        ])
+        ->where('no_reg', $noReg)
+        ->first();
+    }
+
 }

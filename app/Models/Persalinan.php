@@ -24,6 +24,7 @@ class Persalinan extends Model
         'ketuban_pecah',
         'tanggal_jam_ketuban_pecah',
         'status',
+        'tanggal_jam_waktu_bayi_lahir',
     ];
 
     protected $casts = [
@@ -31,6 +32,8 @@ class Persalinan extends Model
         'tanggal_jam_rawat' => 'datetime',
         'tanggal_jam_mules' => 'datetime',
         'tanggal_jam_ketuban_pecah' => 'datetime',
+        'tanggal_jam_waktu_bayi_lahir' => 'datetime',
+
     ];
 
     public function pasien()
@@ -42,16 +45,28 @@ class Persalinan extends Model
      * 🔹 Method ubahStatus()
      * Memastikan status valid sesuai ENUM di DB
      */
-    public function ubahStatus(string $status)
-    {
-        $allowed = ['aktif', 'tidak_aktif', 'selesai'];
-        if (!in_array($status, $allowed)) {
-            throw new InvalidArgumentException("Status tidak valid. Pilihan: " . implode(', ', $allowed));
-        }
-
-        $this->status = $status;
-        $this->save();
-
-        return $this;
+    public function ubahStatus(string $status, $waktu_bayi_lahir = null)
+{
+    $allowed = ['aktif', 'tidak_aktif', 'selesai', 'rujukan'];
+    if (!in_array($status, $allowed)) {
+        throw new InvalidArgumentException("Status tidak valid. Pilihan: " . implode(', ', $allowed));
     }
+
+    $this->status = $status;
+
+    // Jika status selesai → isi tanggal waktu bayi lahir
+    if ($status === 'selesai' && $waktu_bayi_lahir) {
+        $this->tanggal_jam_waktu_bayi_lahir = $waktu_bayi_lahir;
+    }
+
+    $this->save();
+
+    return $this;
+}
+
+    public function partograf()
+{
+    return $this->hasOne(Partograf::class, 'persalinan_id', 'id');
+}
+
 }

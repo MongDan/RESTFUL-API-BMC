@@ -9,6 +9,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Bidan;
 use App\Models\Persalinan;
+use App\Services\CatatanPartografService;
 
 class Pasien extends Authenticatable implements JWTSubject
 {
@@ -74,6 +75,13 @@ class Pasien extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Persalinan::class, 'pasien_no_reg', 'no_reg');
     }
+
+    public function lihatProgresPersalinan()
+{
+    $service = app(CatatanPartografService::class);
+    return $service->getAllCatatanPartografPasien($this->no_reg);
+}
+
 
     // JWT methods
     public function getJWTIdentifier()

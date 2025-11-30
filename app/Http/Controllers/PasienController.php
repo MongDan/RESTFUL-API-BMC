@@ -62,4 +62,44 @@ class PasienController extends Controller
 
         return response()->json($result, $status);
     }
+
+    public function getPasienById($noReg)
+    {
+        $pasien = $this->pasienService->getPasienWithPersalinan($noReg);
+
+        if (!$pasien) {
+            return response()->json([
+                'message' => 'Pasien tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Data pasien ditemukan',
+            'data'    => $pasien
+        ], 200);
+    }
+
+    public function lihatProgres($noReg)
+    {
+        $pasien = Pasien::where('no_reg', $noReg)->first();
+
+        if (!$pasien) {
+            return response()->json([
+                'message' => 'Pasien tidak ditemukan'
+            ], 404);
+        }
+
+        $data = $pasien->lihatProgresPersalinan();
+
+        if (!$data) {
+            return response()->json([
+                'message' => 'Belum ada catatan partograf untuk pasien ini'
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Data progres persalinan ditemukan',
+            'data' => $data
+        ], 200);
+    }
 }

@@ -15,10 +15,6 @@ class PersalinanController extends Controller
         $this->service = $service;
     }
 
-    /**
-     * GET /api/persalinan
-     * Tampilkan daftar persalinan, otomatis filter kalau pasien login
-     */
     public function index(Request $request)
     {
         $user = $request->auth_user;
@@ -38,30 +34,41 @@ class PersalinanController extends Controller
      * Ubah status persalinan (aktif/tidak_aktif/selesai)
      */
         public function ubahStatus(Request $request, $id)
-    {
+{
+    $request->validate([
+        'status' => 'required|string|in:aktif,tidak_aktif,selesai,rujukan',
+    ]);
+
+    $persalinan = Persalinan::findOrFail($id);
+
+    // Jika mau ubah ke status aktif → butuh data ini
+    if ($request->status === 'aktif') {
         $request->validate([
-            'status' => 'required|string|in:aktif,tidak_aktif,selesai',
-        ]);
-
-        $persalinan = Persalinan::findOrFail($id);
-
-        // Check if the status is 'aktif' and require all fields to be filled
-        if ($request->status == 'aktif') {
-            $request->validate([
-                'tanggal_jam_rawat' => 'required|date',
-                'tanggal_jam_mules' => 'required|date',
-                'ketuban_pecah' => 'required|boolean',
-                'tanggal_jam_ketuban_pecah' => 'date',
-            ]);
-        }
-
-        // Update status using the service method
-        $updated = $this->service->ubahStatus($persalinan, $request->status);
-
-        return response()->json([
-            'message' => 'Status persalinan berhasil diubah',
-            'data' => $updated
+            'tanggal_jam_rawat' => 'required|date',
+            'tanggal_jam_mules' => 'required|date',
+            'ketuban_pecah' => 'required|boolean',
+            'tanggal_jam_ketuban_pecah' => 'nullable|date',
         ]);
     }
+
+    // Jika mau ubah ke selesai → minta waktu bayi lahir
+    if ($request->status === 'selesai') {
+        $request->validate([
+            'tanggal_jam_waktu_bayi_lahir' => 'required|date',
+        ]);
+    }
+
+    // Update status dan mungkin update waktu bayi lahir
+    $updated = $this->service->ubahStatus(
+        $persalinan,
+        $request->status,
+        $request->tanggal_jam_waktu_bayi_lahir ?? null
+    );
+
+    return response()->json([
+        'message' => 'Status persalinan berhasil diubah',
+        'data' => $updated
+    ]);
+}
 
 }

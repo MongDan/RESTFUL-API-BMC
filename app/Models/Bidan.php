@@ -45,6 +45,12 @@ class Bidan extends Authenticatable implements JWTSubject
 
     return $bidan;
 }
+    public function tambahPasien(array $data)
+    {
+        // hanya mengembalikan data + id bidan
+        $data['bidan_id'] = $this->id;
+        return $data;
+    }
 
 
     // --- Metode wajib JWT ---
@@ -55,13 +61,16 @@ class Bidan extends Authenticatable implements JWTSubject
 
     public function lihatDaftarPasien()
 {
-    // Ambil pasien + persalinan terbaru pakai eager loading
-    $pasienList = $this->pasien()->with(['persalinan' => function($q) {
-        $q->latest('tanggal_jam_rawat')->limit(1);
-    }])->get();
+    $pasienList = $this->pasien()->with([
+        'persalinan' => function($q) {
+            $q->latest('tanggal_jam_rawat')
+              ->limit(1)
+              ->with('partograf'); 
+        }
+    ])->get();
 
     return $pasienList->map(function($pasien) {
-        $persalinanTerbaru = $pasien->persalinan->first(); // karena limit 1, cuma 1 record
+        $persalinanTerbaru = $pasien->persalinan->first();
 
         return [
             'no_reg' => $pasien->no_reg,
@@ -71,6 +80,7 @@ class Bidan extends Authenticatable implements JWTSubject
             'gravida' => $pasien->gravida,
             'paritas' => $pasien->paritas,
             'abortus' => $pasien->abortus,
+
             'persalinan' => $persalinanTerbaru ? [
                 'id' => $persalinanTerbaru->id,
                 'tanggal_jam_rawat' => $persalinanTerbaru->tanggal_jam_rawat,
@@ -78,10 +88,12 @@ class Bidan extends Authenticatable implements JWTSubject
                 'ketuban_pecah' => $persalinanTerbaru->ketuban_pecah,
                 'tanggal_jam_ketuban_pecah' => $persalinanTerbaru->tanggal_jam_ketuban_pecah,
                 'status' => $persalinanTerbaru->status,
-            ] : null
+            ] : null,
+            'partograf_id' => $persalinanTerbaru->partograf->id ?? null,
         ];
     });
 }
+
 
 
 
@@ -98,7 +110,8 @@ class Bidan extends Authenticatable implements JWTSubject
         'tanggal_jam_rawat' => 'required|date',
         'tanggal_jam_mules' => 'required|date',
         'ketuban_pecah' => 'nullable|boolean',
-        'tanggal_jam_ketuban_pecah' => 'required_if:ketuban_pecah,true|date',
+        'tanggal_jam_ketuban_pecah' => 'required_if:ketuban_pecah,true|nullable|date',
+        'tanggal_jam_waktu_bayi_lahir' => 'nullable|date',
     ]);
 
     // 🔹 Cek existing persalinan aktif
@@ -127,6 +140,7 @@ class Bidan extends Authenticatable implements JWTSubject
     // 🔹 tanggal wajib dari FE
     $tanggalRawat = $validated['tanggal_jam_rawat'];
     $tanggalMules = $validated['tanggal_jam_mules'];
+    $tanggalBayiLahir = $validated['tanggal_jam_waktu_bayi_lahir'] ?? null;
 
     // 🔹 Create persalinan
     $persalinanBaru = Persalinan::create([
@@ -136,7 +150,7 @@ class Bidan extends Authenticatable implements JWTSubject
         'tanggal_jam_mules' => $tanggalMules,
         'ketuban_pecah' => $ketubanPecah,
         'tanggal_jam_ketuban_pecah' => $tglKetuban,
-        'status' => 'aktif',
+        'tanggal_jam_waktu_bayi_lahir' => $tanggalBayiLahir,
     ]);
 
     // 🔹 Generate Partograf
@@ -165,8 +179,6 @@ class Bidan extends Authenticatable implements JWTSubject
         'partograf' => $partograf
     ];
 }
-
-
 
     public function kirimPesan(Pasien $pasien, string $isiPesan)
     {

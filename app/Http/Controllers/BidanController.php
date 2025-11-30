@@ -72,27 +72,29 @@ class BidanController extends Controller
     }
     public function registerPasien(Request $request)
     {
-        // Validasi request
         $validator = Validator::make($request->all(), [
-            'no_reg' => 'required|string|unique:pasien,no_reg',
-            'nama' => 'required|string|max:100',
+            'no_reg'   => 'required|string|unique:pasien,no_reg',
+            'nama'     => 'required|string|max:100',
             'password' => 'nullable|string|min:6',
-            'alamat' => 'required|string|max:60',
-            'umur' => 'required|numeric',
-            'gravida' => 'required|numeric',
-            'paritas' => 'required|numeric',
-            'abortus' => 'required|numeric',
+            'alamat'   => 'required|string|max:60',
+            'umur'     => 'required|numeric',
+            'gravida'  => 'required|numeric',
+            'paritas'  => 'required|numeric',
+            'abortus'  => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $bidan = $request->auth_user; // Ambil dari middleware
-        $data = $request->only(['no_reg', 'nama', 'password', 'alamat', 'umur', 'gravida', 'paritas', 'abortus']);
+        $bidan = $request->auth_user;
 
-        // Panggil service untuk membuat pasien
-        $pasien = $this->bidanService->createPasien($data, $bidan);
+        $data = $request->only([
+            'no_reg', 'nama', 'password', 'alamat', 'umur',
+            'gravida', 'paritas', 'abortus'
+        ]);
+
+        $pasien = $this->bidanService->tambahPasien($data, $bidan);
 
         return response()->json([
             'message' => 'Pasien berhasil didaftarkan',

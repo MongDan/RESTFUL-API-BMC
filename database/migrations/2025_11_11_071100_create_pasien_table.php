@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('paritas', 3); // jumlah persalinan
             $table->string('abortus', 3); // jumlah keguguran
             $table->string('bidan_id', 25)->nullable();
-            $table->timestamps();
         });
     }
 

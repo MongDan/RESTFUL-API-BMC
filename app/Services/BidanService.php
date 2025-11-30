@@ -23,38 +23,43 @@ class BidanService
     /**
      * 🔹 Bidan membuat pasien baru.
      */
-   public function createPasien(array $data, Bidan $bidan): Pasien
+   public function tambahPasien(array $data, Bidan $bidan): Pasien
     {
-        // Username otomatis sama dengan nama
+        // Gabungkan bidan_id lewat behavior model
+        $data = $bidan->tambahPasien($data);
+
+        // Username otomatis = nama
         $username = $data['nama'];
 
-        // Cek duplikasi no_reg dan username
+        // Cek duplikasi no_reg
         if (Pasien::where('no_reg', $data['no_reg'])->exists()) {
             throw ValidationException::withMessages([
                 'no_reg' => 'Nomor registrasi sudah terdaftar.',
             ]);
         }
 
+        // Cek duplikasi username
         if (Pasien::where('username', $username)->exists()) {
             throw ValidationException::withMessages([
                 'username' => 'Username sudah terdaftar.',
             ]);
         }
 
-        // Password default sama dengan username jika tidak diberikan
+        // Password default = username
         $password = $data['password'] ?? $username;
 
+        // Create pasien
         return Pasien::create([
-            'no_reg' => $data['no_reg'],
+            'no_reg'   => $data['no_reg'],
             'username' => $username,
-            'nama' => $data['nama'],
+            'nama'     => $data['nama'],
             'password' => Hash::make($password),
-            'alamat' => $data['alamat'],
-            'umur' => $data['umur'],
-            'gravida' => $data['gravida'],
-            'paritas' => $data['paritas'],
-            'abortus' => $data['abortus'],
-            'bidan_id' => $bidan->id
+            'alamat'   => $data['alamat'],
+            'umur'     => $data['umur'],
+            'gravida'  => $data['gravida'],
+            'paritas'  => $data['paritas'],
+            'abortus'  => $data['abortus'],
+            'bidan_id' => $data['bidan_id'],
         ]);
     }
 

@@ -65,7 +65,7 @@ class CatatanPartograf extends Model
             'protein' => 'nullable|in:-,+,++,+++',
             'volume_urine' => 'nullable|numeric',
             'obat_cairan' => 'nullable|string|max:100',
-            'air_ketuban' => 'nullable|in:j,h,m',
+            'air_ketuban' => 'nullable|in:J,U,M,D,K',
             'molase' => 'nullable|in:0,1,2,3',
         ]);
 

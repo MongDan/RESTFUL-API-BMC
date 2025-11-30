@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\CatatanPartografService;
+use App\Models\CatatanPartograf;
+use App\Models\Partograf;
+use App\Models\Persalinan;
 
 class CatatanPartografController extends Controller
 {
@@ -40,4 +43,5 @@ class CatatanPartografController extends Controller
             'data' => $catatan
         ]);
     }
+
 }
