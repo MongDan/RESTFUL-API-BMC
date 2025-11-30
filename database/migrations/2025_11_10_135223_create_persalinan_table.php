@@ -20,7 +20,12 @@ return new class extends Migration
             $table->string('pasien_no_reg', 25)->nullable();
             $table->timestamp('tanggal_jam_ketuban_pecah')->nullable();
             $table->enum('status', ['aktif', 'tidak_aktif', 'selesai', 'rujukan'])->default('aktif');
-            $table->timestamps('tanggal_jam_waktu_bayi_lahir')->nullable();
+            $table->timestamp('tanggal_jam_waktu_bayi_lahir')->nullable();
+            $table->decimal('berat_badan', 5, 2)->nullable(); 
+            $table->decimal('panjang_badan', 5, 2)->nullable(); 
+            $table->decimal('lingkar_dada', 5, 2)->nullable(); 
+            $table->decimal('lingkar_kepala', 5, 2)->nullable();
+            $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan'])->nullable();
         });
     }
 

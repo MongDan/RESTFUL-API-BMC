@@ -25,6 +25,11 @@ class Persalinan extends Model
         'tanggal_jam_ketuban_pecah',
         'status',
         'tanggal_jam_waktu_bayi_lahir',
+        'berat_badan',
+        'panjang_badan',
+        'lingkar_dada',
+        'lingkar_kepala',
+        'jenis_kelamin',
     ];
 
     protected $casts = [
@@ -33,7 +38,11 @@ class Persalinan extends Model
         'tanggal_jam_mules' => 'datetime',
         'tanggal_jam_ketuban_pecah' => 'datetime',
         'tanggal_jam_waktu_bayi_lahir' => 'datetime',
-
+        'berat_badan' => 'float',
+        'panjang_badan' => 'float',
+        'lingkar_dada' => 'float',
+        'lingkar_kepala' => 'float',
+        'jenis_kelamin' => 'string',
     ];
 
     public function pasien()
@@ -45,24 +54,52 @@ class Persalinan extends Model
      * 🔹 Method ubahStatus()
      * Memastikan status valid sesuai ENUM di DB
      */
-    public function ubahStatus(string $status, $waktu_bayi_lahir = null)
+    public function ubahStatus(string $status, ?array $dataBayi = null): Persalinan
 {
     $allowed = ['aktif', 'tidak_aktif', 'selesai', 'rujukan'];
+
     if (!in_array($status, $allowed)) {
-        throw new InvalidArgumentException("Status tidak valid. Pilihan: " . implode(', ', $allowed));
+        throw new InvalidArgumentException("Status tidak valid.");
     }
 
+    // update status
     $this->status = $status;
+    if ($status === 'selesai') {
 
-    // Jika status selesai → isi tanggal waktu bayi lahir
-    if ($status === 'selesai' && $waktu_bayi_lahir) {
-        $this->tanggal_jam_waktu_bayi_lahir = $waktu_bayi_lahir;
+        if (!$dataBayi) {
+            throw new InvalidArgumentException("Data bayi wajib diisi untuk status selesai.");
+        }
+
+        $required = [
+            'tanggal_jam_waktu_bayi_lahir',
+            'berat_badan',
+            'panjang_badan',
+            'lingkar_dada',
+            'lingkar_kepala',
+            'jenis_kelamin',
+        ];
+
+        foreach ($required as $field) {
+            if (!isset($dataBayi[$field])) {
+                throw new InvalidArgumentException("Field {$field} wajib diisi.");
+            }
+        }
+
+        // simpan ke kolom tabel
+        $this->tanggal_jam_waktu_bayi_lahir = $dataBayi['tanggal_jam_waktu_bayi_lahir'];
+        $this->berat_badan = $dataBayi['berat_badan'];
+        $this->panjang_badan = $dataBayi['panjang_badan'];
+        $this->lingkar_dada = $dataBayi['lingkar_dada'];
+        $this->lingkar_kepala = $dataBayi['lingkar_kepala'];
+        $this->jenis_kelamin = $dataBayi['jenis_kelamin'];
     }
 
+    // HANYA UPDATE — AMAN
     $this->save();
 
     return $this;
 }
+
 
     public function partograf()
 {

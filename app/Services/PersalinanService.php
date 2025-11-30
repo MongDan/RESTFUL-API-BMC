@@ -10,14 +10,18 @@ use InvalidArgumentException;
 class PersalinanService
 {
     
-   public function ubahStatus(Persalinan $persalinan, string $status, $waktu_bayi_lahir = null): Persalinan
+  public function ubahStatus(Persalinan $persalinan, string $status, ?array $dataBayi = null): Persalinan
 {
     try {
-        return $persalinan->ubahStatus($status, $waktu_bayi_lahir);
+        return $persalinan->ubahStatus($status, $dataBayi);
     } catch (InvalidArgumentException $e) {
-        throw ValidationException::withMessages(['status' => $e->getMessage()]);
+        throw ValidationException::withMessages([
+            'status' => $e->getMessage()
+        ]);
     }
 }
+
+
     public function listByPasien(string $pasienNoReg)
     {
         return Persalinan::where('pasien_no_reg', $pasienNoReg)

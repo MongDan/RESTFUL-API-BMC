@@ -28,47 +28,96 @@ class PersalinanController extends Controller
         return response()->json($persalinan);
     }
 
-
-    /**
-     * PUT /api/persalinan/{id}/status
-     * Ubah status persalinan (aktif/tidak_aktif/selesai)
-     */
-        public function ubahStatus(Request $request, $id)
+   public function ubahStatus(Request $request, $id)
 {
-    $request->validate([
-        'status' => 'required|string|in:aktif,tidak_aktif,selesai,rujukan',
-    ]);
-
     $persalinan = Persalinan::findOrFail($id);
 
-    // Jika mau ubah ke status aktif → butuh data ini
-    if ($request->status === 'aktif') {
-        $request->validate([
+    $status = $request->status;
+
+    // --- FIELD BAYI YANG HANYA BOLEH DIISI SAAT STATUS = SELESAI ---
+    $fieldsBayi = [
+        'tanggal_jam_waktu_bayi_lahir',
+        'berat_badan',
+        'panjang_badan',
+        'lingkar_dada',
+        'lingkar_kepala',
+        'jenis_kelamin'
+    ];
+
+    // ❗ JIKA STATUS BUKAN "SELESAI", LARANG INPUT FIELD BAYI
+    if ($status !== 'selesai') {
+        foreach ($fieldsBayi as $field) {
+            if ($request->filled($field)) {
+                return response()->json([
+                    'message' => "Field '{$field}' tidak boleh diisi sebelum status selesai."
+                ], 422);
+            }
+        }
+    }
+
+    // ===============================
+    // STATUS AKTIF
+    // ===============================
+    if ($status === 'aktif') {
+
+        $validated = $request->validate([
+            'status' => 'required',
             'tanggal_jam_rawat' => 'required|date',
             'tanggal_jam_mules' => 'required|date',
             'ketuban_pecah' => 'required|boolean',
             'tanggal_jam_ketuban_pecah' => 'nullable|date',
         ]);
+
+        if ($validated['ketuban_pecah'] == false && $request->filled('tanggal_jam_ketuban_pecah')) {
+            return response()->json(['message' => 'tanggal jam ketuban pecah tidak boleh diisi jika ketuban belum pecah'], 422);
+        }
+
+        if ($validated['ketuban_pecah'] == true && !$request->filled('tanggal_jam_ketuban_pecah')) {
+            return response()->json(['message' => 'tanggal jam ketuban pecah wajib diisi jika ketuban sudah pecah'], 422);
+        }
+
+        $dataBayi = null;
     }
 
-    // Jika mau ubah ke selesai → minta waktu bayi lahir
-    if ($request->status === 'selesai') {
-        $request->validate([
+    // ===============================
+    // STATUS SELESAI
+    // ===============================
+    else if ($status === 'selesai') {
+
+        $validated = $request->validate([
             'tanggal_jam_waktu_bayi_lahir' => 'required|date',
+            'berat_badan' => 'required|numeric',
+            'panjang_badan' => 'required|numeric',
+            'lingkar_dada' => 'required|numeric',
+            'lingkar_kepala' => 'required|numeric',
+            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
         ]);
+
+        $dataBayi = $validated;
     }
 
-    // Update status dan mungkin update waktu bayi lahir
-    $updated = $this->service->ubahStatus(
+    // ===============================
+    // STATUS LAIN
+    // ===============================
+    else {
+
+        $request->validate([
+            'status' => 'required|in:aktif,tidak_aktif,selesai,rujukan'
+        ]);
+
+        $dataBayi = null;
+    }
+
+    // SIMPAN KE SERVICE
+    $result = $this->service->ubahStatus(
         $persalinan,
-        $request->status,
-        $request->tanggal_jam_waktu_bayi_lahir ?? null
+        $status,
+        $dataBayi
     );
 
     return response()->json([
         'message' => 'Status persalinan berhasil diubah',
-        'data' => $updated
+        'data' => $result
     ]);
 }
-
 }
