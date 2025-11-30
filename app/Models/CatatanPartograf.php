@@ -76,9 +76,5 @@ class CatatanPartograf extends Model
         return $validator->validated();
     }
 
-     public static function getCatatanPartograf(string $partografId)
-    {
-        $service = app(CatatanPartografService::class);
-        return $service->getByPartografId($partografId);
-    }
+    
 }

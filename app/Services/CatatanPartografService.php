@@ -70,9 +70,15 @@ class CatatanPartografService
 
 public function getByPartografId(string $partografId)
     {
-        return CatatanPartograf::with('kontraksi')
-            ->where('partograf_id', $partografId)
-            ->orderBy('waktu_catat', 'asc')
-            ->get();
+        // 1. Cari Partograf induknya dulu
+        $partograf = Partograf::find($partografId);
+
+        if (!$partograf) {
+            return collect([]); // Kembalikan collection kosong jika partograf tidak ada
+        }
+
+        // 2. Delegasikan pengambilan data ke Model Partograf
+        // Sesuai diagram: Partograf -> getDaftarCatatan()
+        return $partograf->getDaftarCatatan();
     }
 }

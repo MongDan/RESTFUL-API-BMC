@@ -33,6 +33,7 @@ class CatatanPartografController extends Controller
 
     public function getCatatanByPartograf($id)
     {
+        // Controller panggil Service -> Service panggil Model Partograf
         $catatan = $this->service->getByPartografId($id);
 
         if ($catatan->isEmpty()) {

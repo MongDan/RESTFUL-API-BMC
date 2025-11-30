@@ -39,26 +39,17 @@ class KontenEdukasiController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input untuk memastikan judul dan isi konten ada
         $request->validate([
             'judul_konten' => 'required|string|max:255',
             'isi_konten'   => 'required|string',
         ]);
 
-        // Ambil data input
-        $judulKonten = $request->input('judul_konten');
-        $isiKonten = $request->input('isi_konten');
-
-        // Ambil ID bidan dari pengguna yang sedang login (asumsi menggunakan JWT)
-        $user = $request->auth_user; // Sesuaikan dengan cara kamu menangani autentikasi pengguna
-        $bidanId = $user->id;
+        // Ambil Objek Bidan Full (bukan cuma ID)
+        $bidan = $request->auth_user; 
 
         try {
-            // Buat konten edukasi, ID konten akan di-generate otomatis
-            $konten = $this->service->buatKonten($bidanId, [
-                'judul_konten' => $judulKonten,
-                'isi_konten' => $isiKonten,
-            ]);
+            // Kirim Objek Bidan ke Service
+            $konten = $this->service->buatKonten($bidan, $request->only('judul_konten', 'isi_konten'));
 
             return response()->json([
                 'status' => 'success',
@@ -66,16 +57,9 @@ class KontenEdukasiController extends Controller
                 'data' => $konten,
             ], 201);
         } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Input tidak valid.',
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(['status' => 'error', 'errors' => $e->errors()], 422);
         } catch (\Throwable $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
-            ], 500);
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -84,13 +68,12 @@ class KontenEdukasiController extends Controller
      * DELETE /api/konten-edukasi/{id}
      * Hapus konten edukasi milik bidan.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id) // Tambah Request $request
     {
-        $user = $request->auth_user;
-
+        $bidan = $request->auth_user; // Ambil dari middleware
 
         try {
-            $this->service->hapusKonten($user, $id);
+            $this->service->hapusKonten($bidan, $id);
 
             return response()->json([
                 'status'  => 'success',

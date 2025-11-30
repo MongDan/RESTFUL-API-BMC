@@ -25,4 +25,17 @@ class Partograf extends Model
     {
         return $this->belongsTo(Persalinan::class, 'persalinan_id', 'id');
     }
+
+    public function catatan()
+    {
+        return $this->hasMany(CatatanPartograf::class, 'partograf_id', 'id');
+    }
+
+    public function getDaftarCatatan()
+    {
+        return $this->catatan()
+            ->with('kontraksi') // Eager load kontraksi dari tiap catatan
+            ->orderBy('waktu_catat', 'asc')
+            ->get();
+    }
 }

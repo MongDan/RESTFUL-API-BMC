@@ -27,14 +27,4 @@ class KontenEdukasi extends Model
         return $this->belongsTo(Bidan::class, 'bidan_id', 'id');
     }
 
-    // representasi method di class diagram
-    public static function buatKonten(array $attributes): self
-    {
-        return self::create($attributes);
-    }
-
-    public function hapusKonten(): ?bool
-    {
-        return $this->delete();
-    }
 }
