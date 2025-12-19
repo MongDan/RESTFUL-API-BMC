@@ -169,24 +169,6 @@ class Bidan extends Authenticatable implements JWTSubject
         ];
     }
 
-    // 4. Kirim Pesan
-    public function kirimPesan(Pasien $pasien, string $isiPesan)
-    {
-        if ($pasien->bidan_id !== $this->id) {
-            throw ValidationException::withMessages([
-                'pasien' => 'Pasien ini bukan pasien Anda.'
-            ]);
-        }
-
-        return Pesan::create([
-            'bidan_id' => $this->id,
-            'pasien_id' => $pasien->id,
-            'isiPesan' => $isiPesan,
-            'pengirim' => 'bidan',
-            'waktuKirim' => now(),
-        ]);
-    }
-    
 
     public function buatKonten(array $data): KontenEdukasi
     {

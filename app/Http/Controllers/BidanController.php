@@ -125,33 +125,4 @@ class BidanController extends Controller
     }
 }
 
-
-    public function kirimPesan(Request $request, $pasienId)
-    {
-        $validator = Validator::make($request->all(), [
-            'isiPesan' => 'required|string|max:500',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $bidan = $request->auth_user;
-        $pasien = Pasien::find($pasienId);
-
-        if (!$pasien) {
-            return response()->json(['error' => 'Pasien tidak ditemukan.'], 404);
-        }
-
-        try {
-            $pesan = $this->bidanService->kirimPesan($bidan, $pasien, $request->isiPesan);
-
-            return response()->json([
-                'message' => 'Pesan berhasil dikirim.',
-                'pesan' => $pesan
-            ], 201);
-        } catch (ValidationException $e) {
-            return response()->json(['errors' => $e->errors()], 422);
-        }
-    }
 }

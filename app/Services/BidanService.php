@@ -74,9 +74,4 @@ class BidanService
     return $bidan->mulaiPersalinan($request, $pasien);
 }
 
-
-    public function kirimPesan(Bidan $bidan, Pasien $pasien, string $isiPesan)
-    {
-        return $bidan->kirimPesan($pasien, $isiPesan);
-    }
 }
