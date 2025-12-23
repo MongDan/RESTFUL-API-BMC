@@ -52,6 +52,8 @@ Route::middleware([JwtCookieMiddleware::class])->group(function () {
     //get bidan by pasien no_reg
     Route::get('/pasien/{no_reg}/bidanId', [PasienController::class, 'getBidan']);
 
+    Route::post('/darurat', [PasienController::class, 'darurat']);
+
 
 });
 
@@ -64,6 +66,10 @@ Route::middleware([JwtCookieMiddleware::class, BidanMiddleware::class])->group(f
     Route::post('/partograf/{id}/catatan', [CatatanPartografController::class, 'buatCatatanPartograf']);
 
     Route::post('/catatan-partograf/{id}/kontraksi', [KontraksiController::class, 'store']);
+
+    Route::post('/darurat/{id}/konfirmasi', [BidanController::class, 'konfirmasiDarurat']);
+
+    Route::post('/bidan/update-token', [BidanController::class, 'updateToken']);
 
     // Konten Edukasi
     Route::post('/konten-edukasi', [KontenEdukasiController::class, 'store']);

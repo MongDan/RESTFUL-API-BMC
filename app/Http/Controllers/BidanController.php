@@ -149,4 +149,43 @@ class BidanController extends Controller
     }
 }
 
+    public function konfirmasiDarurat(Request $request, $idDarurat)
+    {
+        $bidan = auth('bidan')->user();
+
+        // PANGGIL FUNCTION MODEL SESUAI DIAGRAM
+        $berhasil = $bidan->konfirmasiDarurat($idDarurat);
+
+        if ($berhasil) {
+            return response()->json(['message' => 'Status darurat diselesaikan.'], 200);
+        } else {
+            return response()->json(['message' => 'Gagal konfirmasi. Data tidak ditemukan.'], 404);
+        }
+    }
+
+    public function updateToken(Request $request)
+    {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'token' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        
+        // Ambil bidan yang sedang login (dari token JWT)
+        // Pastikan middleware auth:bidan aktif di route
+        $bidan = auth('bidan')->user();
+        
+        if (!$bidan) {
+             return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Simpan token Expo ke database
+        $bidan->update(['fcm_token' => $request->token]);
+
+        return response()->json(['message' => 'Token notifikasi berhasil disimpan']);
+    }
+
 }
