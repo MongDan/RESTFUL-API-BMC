@@ -58,6 +58,8 @@ class CatatanPartografService
                     'diastolik' => $item->diastolik,
                     'nadi_ibu' => $item->nadi_ibu,
                     'suhu_ibu' => $item->suhu_ibu,
+                    'oksitosin' => $item->oksitosin,
+                    'total_tetes' => $item->total_tetes,
                     'kontraksi' => $item->kontraksi ?? null,
                 ];
             });

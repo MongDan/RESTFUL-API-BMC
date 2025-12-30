@@ -37,6 +37,8 @@ return new class extends Migration
             $table->enum('molase', ['0', '1', '2', '3'])->nullable();
             $table->integer('kontraksi_frekuensi')->nullable();
             $table->integer('kontraksi_durasi')->nullable();
+            $table->string('oksitosin', 100)->nullable()->after('obat_cairan');
+            $table->integer('total_tetes')->nullable()->after('oksitosin');
             $table->string('partograf_id', 25)->nullable();
         });
     }

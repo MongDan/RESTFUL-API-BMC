@@ -33,6 +33,8 @@ class CatatanPartograf extends Model
         'volume_urine',
         'obat_cairan',
         'air_ketuban',
+        'oksitosin',     // ✅ TAMBAH
+        'total_tetes'
         'kontraksi_frekuensi',
         'kontraksi_durasi',
         'molase',
@@ -67,6 +69,8 @@ class CatatanPartograf extends Model
             'protein' => 'nullable|in:-,+,++,+++',
             'volume_urine' => 'nullable|numeric',
             'obat_cairan' => 'nullable|string|max:100',
+            'oksitosin' => 'nullable|string|max:100',
+            'total_tetes' => 'nullable|integer|min:0',
             'air_ketuban' => 'nullable|in:J,U,M,D,K',
             'kontraksi_frekuensi' => 'nullable|numeric|min:0|max:5', // <--- TAMBAHAN
             'kontraksi_durasi' => 'nullable|numeric|',
