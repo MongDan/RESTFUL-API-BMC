@@ -34,7 +34,7 @@ class CatatanPartograf extends Model
         'obat_cairan',
         'air_ketuban',
         'oksitosin',     // ✅ TAMBAH
-        'total_tetes'
+        'total_tetes',
         'kontraksi_frekuensi',
         'kontraksi_durasi',
         'molase',
